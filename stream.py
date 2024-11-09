@@ -1,13 +1,13 @@
-import streamlit as st
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import streamlit
+# import streamlit as s
+# import numpy as np
+# import pandas as ppyplot as plt
+# import streamlitd
+# import matplotlib.
 # Title of the app
-import pip
-installed_packages = pip.get_installed_distributions()
-for package in installed_packages:
-    print(package)
+streamlit
+numpy 
+pandas
+matplotlib
 
 st.title('My First Streamlit App')
 
