@@ -4,6 +4,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import streamlit
 # Title of the app
+import pip
+installed_packages = pip.get_installed_distributions()
+for package in installed_packages:
+    print(package)
+
 st.title('My First Streamlit App')
 
 # Display some text
