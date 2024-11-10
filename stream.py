@@ -58,45 +58,25 @@ init_db()
 # App UI
 st.title("Monthly Expenditure Tracker")
 
-# Set default values for session state if not already set
-if "form_data" not in st.session_state:
-    st.session_state.form_data = {
-        "date": datetime.now(),
-        "category": "Food",
-        "description": "",
-        "amount": 0.0
-    }
-
 # Sidebar form to add expenses
-with st.sidebar.form("expense_form"):
+with st.sidebar.form("expense_form", clear_on_submit=True):
     st.subheader("Add New Expense")
-    st.session_state.form_data["date"] = st.date_input("Date", st.session_state.form_data["date"])
-    st.session_state.form_data["category"] = st.selectbox("Category", ["Food", "Transport", "Rent", "Utilities", "Others"], index=["Food", "Transport", "Rent", "Utilities", "Others"].index(st.session_state.form_data["category"]))
-    st.session_state.form_data["description"] = st.text_input("Description", st.session_state.form_data["description"])
-    st.session_state.form_data["amount"] = st.number_input("Amount", min_value=0.0, value=st.session_state.form_data["amount"], format="%.2f")
+    date = st.date_input("Date", datetime.now())
+    category = st.selectbox("Category", ["Food", "Transport", "Rent", "Utilities", "Others"])
+    description = st.text_input("Description")
+    amount = st.number_input("Amount", min_value=0.0, format="%.2f")
     
     submit_button = st.form_submit_button("Add Expense")
-    clear_button = st.form_submit_button("Clear Form")
 
 # Handle form submission
 if submit_button:
-    insert_expense(st.session_state.form_data["date"].strftime("%Y-%m-%d"), st.session_state.form_data["category"], st.session_state.form_data["description"], st.session_state.form_data["amount"])
+    insert_expense(date.strftime("%Y-%m-%d"), category, description, amount)
     st.success("Expense added successfully!")
-
-# Handle form reset
-if clear_button:
-    st.session_state.form_data = {
-        "date": datetime.now(),
-        "category": "Food",
-        "description": "",
-        "amount": 0.0
-    }
 
 # Delete all records button
 if st.sidebar.button("Delete All Records"):
-    if st.sidebar.checkbox("Confirm Delete"):
-        delete_all_expenses()
-        st.sidebar.success("All records have been deleted!")
+    delete_all_expenses()
+    st.sidebar.success("All records have been deleted!")
 
 # Display the expenses table
 st.subheader("All Expenses")
