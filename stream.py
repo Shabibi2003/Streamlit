@@ -59,45 +59,44 @@ init_db()
 st.title("Monthly Expenditure Tracker")
 
 # Set default values for session state if not already set
-if "date" not in st.session_state:
-    st.session_state.date = datetime.now()
-if "category" not in st.session_state:
-    st.session_state.category = "Food"
-if "description" not in st.session_state:
-    st.session_state.description = ""
-if "amount" not in st.session_state:
-    st.session_state.amount = 0.0
+if "form_data" not in st.session_state:
+    st.session_state.form_data = {
+        "date": datetime.now(),
+        "category": "Food",
+        "description": "",
+        "amount": 0.0
+    }
 
 # Sidebar form to add expenses
 with st.sidebar.form("expense_form"):
     st.subheader("Add New Expense")
-    st.session_state.date = st.date_input("Date", st.session_state.date)
-    st.session_state.category = st.selectbox("Category", ["Food", "Transport", "Rent", "Utilities", "Others"], index=["Food", "Transport", "Rent", "Utilities", "Others"].index(st.session_state.category))
-    st.session_state.description = st.text_input("Description", st.session_state.description)
-    st.session_state.amount = st.number_input("Amount", min_value=0.0, value=st.session_state.amount, format="%.2f")
+    st.session_state.form_data["date"] = st.date_input("Date", st.session_state.form_data["date"])
+    st.session_state.form_data["category"] = st.selectbox("Category", ["Food", "Transport", "Rent", "Utilities", "Others"], index=["Food", "Transport", "Rent", "Utilities", "Others"].index(st.session_state.form_data["category"]))
+    st.session_state.form_data["description"] = st.text_input("Description", st.session_state.form_data["description"])
+    st.session_state.form_data["amount"] = st.number_input("Amount", min_value=0.0, value=st.session_state.form_data["amount"], format="%.2f")
     
     submit_button = st.form_submit_button("Add Expense")
     clear_button = st.form_submit_button("Clear Form")
 
 # Handle form submission
 if submit_button:
-    insert_expense(st.session_state.date.strftime("%Y-%m-%d"), st.session_state.category, st.session_state.description, st.session_state.amount)
+    insert_expense(st.session_state.form_data["date"].strftime("%Y-%m-%d"), st.session_state.form_data["category"], st.session_state.form_data["description"], st.session_state.form_data["amount"])
     st.success("Expense added successfully!")
 
 # Handle form reset
 if clear_button:
-    st.session_state.date = datetime.now()
-    st.session_state.category = "Food"
-    st.session_state.description = ""
-    st.session_state.amount = 0.0
-    st.experimental_rerun()  # Only resets the form without impacting other parts of the app
+    st.session_state.form_data = {
+        "date": datetime.now(),
+        "category": "Food",
+        "description": "",
+        "amount": 0.0
+    }
 
 # Delete all records button
 if st.sidebar.button("Delete All Records"):
     if st.sidebar.checkbox("Confirm Delete"):
         delete_all_expenses()
         st.sidebar.success("All records have been deleted!")
-        st.experimental_rerun()  # Refresh to update the UI after deletion
 
 # Display the expenses table
 st.subheader("All Expenses")
