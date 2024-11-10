@@ -1,6 +1,7 @@
 import streamlit as st
 import sqlite3
 from datetime import datetime
+import pandas as pd
 
 # Database connection
 def create_connection():
@@ -73,5 +74,21 @@ if reset_button:
 # Display the expenses table
 st.subheader("All Expenses")
 expenses = view_expenses()
-for expense in expenses:
-    st.write(f"Date: {expense[1]}, Category: {expense[2]}, Description: {expense[3]}, Amount: ${expense[4]:.2f}")
+
+# Convert data to DataFrame
+if expenses:
+    df = pd.DataFrame(expenses, columns=["ID", "Date", "Category", "Description", "Amount"])
+    st.dataframe(df)
+
+    # Display a bar chart of expenses by category
+    st.subheader("Expenses by Category")
+    expenses_by_category = df.groupby("Category")["Amount"].sum()
+    st.bar_chart(expenses_by_category)
+    
+    # Display a line chart of expenses over time
+    st.subheader("Expenses Over Time")
+    df["Date"] = pd.to_datetime(df["Date"])
+    expenses_over_time = df.groupby("Date")["Amount"].sum()
+    st.line_chart(expenses_over_time)
+else:
+    st.write("No expenses to display.")
