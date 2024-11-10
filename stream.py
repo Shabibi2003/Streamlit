@@ -45,7 +45,11 @@ def view_expenses():
     return rows
 
 # Delete all records in the database
+# Delete all records in the database
 def delete_all_expenses():
     conn = create_connection()
     cursor = conn.cursor()
-    cursor.execute('DELETE
+    cursor.execute('DELETE FROM expenses')
+    conn.commit()
+    conn.close()
+
