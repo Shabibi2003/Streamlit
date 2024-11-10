@@ -102,9 +102,16 @@ if expenses:
     
     # Group by date and sort for time-series plotting
     expenses_over_time = df.groupby("Date")["Amount"].sum().sort_index()
-    
+
     if not expenses_over_time.empty:
+        # Calculate the total sum of expenses
+        total_expense = expenses_over_time.sum()
+
+        # Plot the line chart of expenses over time
         st.line_chart(expenses_over_time)
+
+        # Display total spending below the graph
+        st.write(f"**Total Spending:** {total_expense:.2f}")
     else:
         st.write("No data available for the 'Expenses Over Time' chart.")
 else:
