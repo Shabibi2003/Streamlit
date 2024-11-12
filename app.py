@@ -7,7 +7,6 @@ import seaborn as sns
 # Title of the Streamlit app
 st.title("Calendar Heatmaps for Air Quality Features")
 
-
 # Read the CSV into a DataFrame
 df = pd.read_csv("final.csv")
 
@@ -45,6 +44,9 @@ if 'date' in df.columns:
     n_features = len(features)
     fig, axes = plt.subplots(n_features, 1, figsize=(12, n_features * 3), constrained_layout=True)
 
+    # Define the list of day names for the x-axis labels
+    day_names = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
     for i, feature in enumerate(features):
         # Resample and reshape the data for the current feature
         daily_data = df[feature].resample('D').mean()
@@ -58,8 +60,11 @@ if 'date' in df.columns:
 
         # Set the title and labels for each subplot
         axes[i].set_title(f'Calendar Heatmap of Daily Average {feature}')
-        axes[i].set_xlabel('Day of the Week (0=Monday)')
+        axes[i].set_xlabel('Day of the Week')
         axes[i].set_ylabel('Week')
+
+        # Adjust the x-axis tick labels to show the names of the days
+        axes[i].set_xticklabels(day_names, rotation=45)
 
     # Display the calendar heatmaps using Streamlit's pyplot function
     st.pyplot(fig)
