@@ -7,7 +7,7 @@ import calendar
 
 # Load data
 df = pd.read_csv("final.csv")
-df = df.drop(columns=[df.columns[0]])
+df = df.drop(columns=[df.columns[0]])  # Drop the first column if it's an index or unwanted column
 
 # Ensure 'date' column exists and is in correct datetime format
 if 'date' in df.columns:
@@ -19,11 +19,18 @@ else:
 
 df.set_index('date', inplace=True)
 
-# Features for visualization
-features = ['pm2.5', 'pm10', 'aqi', 'co2', 'voc', 'temp', 'humidity', 'battery', 'viral_index']  # Replaced pm25 with pm2.5
+# Show the raw dataset in Streamlit UI
+st.title("Air Quality Data Overview")
 
-# Streamlit app title
-st.title("Calendar Heatmap")
+# Display the raw data as a table
+st.subheader("Raw Data")
+st.dataframe(df)
+
+# Print column names for debugging purposes
+st.write("Available columns in the dataset:", df.columns)
+
+# Features for visualization (use actual column names in the dataset)
+features = ['pm2.5', 'pm10', 'aqi', 'co2', 'voc', 'temp', 'humidity', 'battery', 'viral_index']  # Replaced pm25 with pm2.5
 
 # Automatically select the month and year based on the data
 # Here, we just use the first entry in the data to extract the month and year
@@ -69,6 +76,11 @@ def create_calendar_heatmap(data, month, year, feature):
 
 # Plot the calendar heatmap for each feature
 for feature in features:
+    # Check if the feature exists in the dataset
+    if feature not in df.columns:
+        st.error(f"Feature '{feature}' does not exist in the dataset.")
+        continue
+    
     # Generate the calendar grid for the current feature
     calendar_grid = create_calendar_heatmap(filtered_df, month, year, feature)
     
