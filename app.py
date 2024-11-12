@@ -7,11 +7,8 @@ import seaborn as sns
 # Title of the Streamlit app
 st.title("Calendar Heatmaps for Air Quality Features")
 
-# Path to the CSV file (static file path)
-csv_file_path = "final.csv"  # Adjust this path as per your file location
-
 # Read the CSV into a DataFrame
-df = pd.read_csv(csv_file_path)
+df = pd.read_csv('final.csv')
 
 # Drop the first column (which seems like an index or unnecessary column)
 df = df.drop(df.columns[0], axis=1)
