@@ -20,7 +20,7 @@ else:
 df.set_index('date', inplace=True)
 
 # Features for visualization
-features = ['pm2.5', 'pm10', 'aqi', 'co2', 'voc', 'temp', 'humidity', 'battery', 'viral_index']  # Replaced pm25 with pm2.5
+features = ['pm25', 'pm10', 'aqi', 'co2', 'voc', 'temp', 'humidity', 'battery', 'viral_index']
 
 # Streamlit app title
 st.title("Calendar Heatmap")
