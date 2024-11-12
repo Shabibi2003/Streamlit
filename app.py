@@ -12,13 +12,7 @@ st.write("""
 """)
 
 # Load the data from a predefined CSV file path (adjust this path to where your CSV file is stored)
-# Here, I'm using a sample file 'final.csv' from the same directory where the Streamlit app is running.
-# You can replace this with any other path or URL if needed.
 df = pd.read_csv('final.csv')
-
-# Display the first few rows of the data
-st.subheader("Raw Data")
-st.dataframe(df.head())
 
 # Ensure the 'date' column exists and is in correct datetime format
 if 'date' in df.columns:
@@ -50,14 +44,24 @@ weekday_labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 for i, feature in enumerate(features):
     # Resample and reshape the data for the current feature
     daily_data = df[feature].resample('D').mean()
+
+    # Reindex the data to ensure all days are present in the month, even if some days have missing data
+    all_days = pd.date_range(start=daily_data.index.min(), end=daily_data.index.max(), freq='D')
+    daily_data = daily_data.reindex(all_days)
+
+    # Pivot the data to a calendar format
     calendar_data = daily_data.to_frame().pivot_table(
-        index=daily_data.index.to_period("W"), columns=daily_data.index.dayofweek, values=feature
+        index=daily_data.index.to_period("W"),  # Group by week
+        columns=daily_data.index.dayofweek,     # Columns for days of the week (0=Monday)
+        values=feature,                          # Values for the feature
+        aggfunc='mean'                           # Use mean for aggregation
     )
 
     # Plot the heatmap for the feature
     sns.heatmap(calendar_data, cmap='coolwarm', annot=True, fmt=".1f", 
                 cbar_kws={'label': f'Average {feature}'}, ax=axes[i], 
-                xticklabels=weekday_labels, annot_kws={'size': 10, 'weight': 'bold'})
+                xticklabels=weekday_labels, annot_kws={'size': 10, 'weight': 'bold'}, 
+                cbar=True, linewidths=0.5)
 
     # Set the title and labels for each subplot
     axes[i].set_title(f'Calendar Heatmap of Daily Average {feature}')
