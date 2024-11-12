@@ -6,7 +6,7 @@ import seaborn as sns
 import calendar
 
 # Load data
-df = pd.read_csv(r"C:\Users\abhis\final.csv")
+df = pd.read_csv("final.csv")
 df = df.drop(columns=[df.columns[0]])
 
 # Ensure 'date' column exists and is in correct datetime format
