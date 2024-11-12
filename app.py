@@ -25,13 +25,11 @@ features = ['pm25', 'pm10', 'aqi', 'co2', 'voc', 'temp', 'humidity', 'battery', 
 # Streamlit app title
 st.title("Calendar Heatmap")
 
-# Date selection
-selected_date = st.date_input("Select a date", value=df.index.min())
-selected_date = pd.to_datetime(selected_date)  # Ensure it's a datetime object
-
-# Extract the month and year from the selected date
-month = selected_date.month
-year = selected_date.year
+# Automatically select the month and year based on the data
+# Here, we just use the first entry in the data to extract the month and year
+first_date = df.index.min()
+month = first_date.month
+year = first_date.year
 
 # Filter data for the selected month and year
 filtered_df = df[(df.index.month == month) & (df.index.year == year)]
