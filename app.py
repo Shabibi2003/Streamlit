@@ -8,10 +8,9 @@ import seaborn as sns
 st.title("Calendar Heatmaps for Air Quality Features")
 
 # Path to the CSV file (static file path)
-csv_file_path = "https://raw.githubusercontent.com/yourusername/yourrepo/main/final.csv"  # Adjust path or URL
 
 # Read the CSV into a DataFrame
-df = pd.read_csv(csv_file_path)
+df = pd.read_csv("final.csv")
 
 # Display first few rows to understand the structure of the CSV file
 st.write("Here are the first few rows of your data:")
