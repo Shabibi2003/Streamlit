@@ -9,7 +9,7 @@ st.title("Calendar Heatmaps for Air Quality Features")
 
 # Read the CSV into a DataFrame
 df = pd.read_csv("final.csv")
-
+df = df.drop(df.columns[0], axis=1)
 # Display first few rows to understand the structure of the CSV file
 st.write("Here are the first few rows of your data:")
 st.dataframe(df.head())  # Display the first few rows of the DataFrame in Streamlit UI
