@@ -39,11 +39,14 @@ def create_calendar_heatmap(data, month, year, feature):
     # Get the number of days in the selected month
     num_days = calendar.monthrange(year, month)[1]
     
-    # Create a grid for the calendar
-    calendar_grid = np.full((6, 7), np.nan)  # 6 rows (weeks), 7 columns (days of the week)
-    
     # Get the starting weekday for the month (e.g., Monday=0, Sunday=6)
     first_day_of_month = calendar.monthrange(year, month)[0]
+    
+    # Calculate the number of weeks required for the current month
+    num_weeks = (num_days + first_day_of_month - 1) // 7 + 1  # We calculate how many full weeks fit into the month
+    
+    # Create a grid for the calendar, dynamically adjust rows based on the number of weeks
+    calendar_grid = np.full((num_weeks, 7), np.nan)  # Use 'num_weeks' instead of hardcoding 6
     
     # Populate the calendar grid with values from the feature
     for day in range(1, num_days + 1):
@@ -72,8 +75,8 @@ for feature in features:
     # Create the heatmap plot
     fig, ax = plt.subplots(figsize=(12, 6))
     sns.heatmap(calendar_grid, cmap='coolwarm', annot=True, fmt=".1f", cbar_kws={'label': feature},
-                xticklabels=[ 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat','Sun'],
-                yticklabels=['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+                xticklabels=['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                yticklabels=[f'Week {i+1}' for i in range(calendar_grid.shape[0])],  # Adjust week labels dynamically
                 ax=ax, square=True, annot_kws={'size': 10, 'weight': 'bold'})
 
     # Add title and labels
