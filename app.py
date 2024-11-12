@@ -9,7 +9,7 @@ st.title("Calendar Heatmaps for Air Quality Features")
 
 # Read the CSV into a DataFrame
 df = pd.read_csv("final.csv")
-df = df.drop(df.columns[0], axis=1)
+df = df.drop(df.columns[0], axis=1)  # Drop first column (if necessary)
 # Display first few rows to understand the structure of the CSV file
 st.write("Here are the first few rows of your data:")
 st.dataframe(df.head())  # Display the first few rows of the DataFrame in Streamlit UI
@@ -40,9 +40,9 @@ if 'date' in df.columns:
     # List of features to plot
     features = ['pm25', 'pm10', 'aqi', 'co2', 'voc', 'temp', 'humidity', 'battery', 'viral_index']
 
-    # Set up the subplot grid
+    # Set up the subplot grid with larger figure size
     n_features = len(features)
-    fig, axes = plt.subplots(n_features, 1, figsize=(12, n_features * 3), constrained_layout=True)
+    fig, axes = plt.subplots(n_features, 1, figsize=(18, n_features * 5), constrained_layout=True)  # Increased size
 
     # Define the list of day names for the x-axis labels
     day_names = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
