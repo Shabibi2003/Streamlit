@@ -7,23 +7,37 @@ import seaborn as sns
 # Title of the Streamlit app
 st.title("Calendar Heatmaps for Air Quality Features")
 
-# Path to the CSV file (static file path)
+# Path to the CSV file (static file path or URL)
+csv_file_path = "https://raw.githubusercontent.com/yourusername/yourrepo/main/final.csv"  # Adjust path or URL
 
 # Read the CSV into a DataFrame
-df = pd.read_csv("final.csv")
-df = df.drop(df.columns[0], axis=1)
+df = pd.read_csv(csv_file_path)
+
 # Display first few rows to understand the structure of the CSV file
 st.write("Here are the first few rows of your data:")
 st.dataframe(df.head())  # Display the first few rows of the DataFrame in Streamlit UI
 
+# Strip any leading/trailing spaces from the column names (in case there are any)
+df.columns = df.columns.str.strip()
+
 # Check if 'date' column exists
 if 'date' in df.columns:
-    # Attempt to convert 'date' to datetime, handle errors gracefully
-    df['date'] = pd.to_datetime(df['date'], errors='coerce')  # Invalid dates will become NaT
+    # Before attempting to convert 'date' to datetime, print out unique or problematic dates
+    # Strip any extra spaces from the date column, just in case
+    df['date'] = df['date'].str.strip()
+
+    # Display unique or suspicious date entries
+    st.write("Here are some unique or suspicious date values that might cause issues:")
+    st.write(df['date'].unique())  # Print out the unique date entries
+
+    # Attempt to convert 'date' to datetime with error handling
+    df['date'] = pd.to_datetime(df['date'], errors='coerce', dayfirst=True)  # dayfirst=True for DD/MM/YYYY format
 
     # Check for missing values after conversion
-    if df['date'].isna().sum() > 0:
-        st.warning(f"There are {df['date'].isna().sum()} invalid date entries that were coerced to NaT.")
+    invalid_dates = df[df['date'].isna()]
+    if not invalid_dates.empty:
+        st.write("Rows with invalid dates:")
+        st.dataframe(invalid_dates)  # Show the rows with invalid date values
 
     # Drop rows where 'date' is NaT after coercion (if necessary)
     df = df.dropna(subset=['date'])
