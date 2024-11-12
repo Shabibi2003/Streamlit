@@ -41,9 +41,6 @@ if 'date' in df.columns:
     # List of features to plot
     features = ['pm25', 'pm10', 'aqi', 'co2', 'voc', 'temp', 'humidity', 'battery', 'viral_index']
 
-    # Define weekday names for y-axis
-    week_days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-
     # Set up the subplot grid
     n_features = len(features)
     fig, axes = plt.subplots(n_features, 1, figsize=(12, n_features * 3), constrained_layout=True)
@@ -51,19 +48,9 @@ if 'date' in df.columns:
     for i, feature in enumerate(features):
         # Resample and reshape the data for the current feature
         daily_data = df[feature].resample('D').mean()
-        
-        # Pivot table with weeks on the x-axis (week of the year) and days of the week on the y-axis
         calendar_data = daily_data.to_frame().pivot_table(
-            index=daily_data.index.dayofweek,  # days of the week (0=Monday, 6=Sunday)
-            columns=daily_data.index.to_period("W"),  # Weeks represented as periods
-            values=feature
+            index=daily_data.index.to_period("W"), columns=daily_data.index.dayofweek, values=feature
         )
-
-        # Map numeric days (0=Monday, 6=Sunday) to the corresponding weekday names
-        calendar_data.index = calendar_data.index.map(lambda x: week_days[x])
-
-        # Convert the PeriodIndex to strings representing the weeks (e.g., '2024-W01')
-        calendar_data.columns = calendar_data.columns.astype(str)
 
         # Plot the heatmap for the feature
         sns.heatmap(calendar_data, cmap='coolwarm', annot=True, fmt=".1f", 
@@ -71,11 +58,8 @@ if 'date' in df.columns:
 
         # Set the title and labels for each subplot
         axes[i].set_title(f'Calendar Heatmap of Daily Average {feature}')
-        axes[i].set_xlabel('Week (Year-Week Number)')
-        axes[i].set_ylabel('Day of the Week')
-
-        # Rotate x-axis labels for better readability
-        axes[i].tick_params(axis='x', rotation=45)
+        axes[i].set_xlabel('Day of the Week (0=Monday)')
+        axes[i].set_ylabel('Week')
 
     # Display the calendar heatmaps using Streamlit's pyplot function
     st.pyplot(fig)
