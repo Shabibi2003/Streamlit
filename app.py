@@ -1,85 +1,76 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-import calendar
 
-# Load data
-df = pd.read_csv("final.csv")
-df = df.drop(columns=[df.columns[0]])
+# Set up the Streamlit title and description
+st.title("Air Quality Data Visualization")
 
-# Ensure 'date' column exists and is in correct datetime format
-if 'date' in df.columns:
-    df['date'] = pd.to_datetime(df['date'], errors='coerce')  # Convert to datetime, invalid entries will be NaT
-    df = df.dropna(subset=['date'])  # Remove rows with invalid date entries
-else:
-    st.error("The 'date' column does not exist in the dataset.")
-    st.stop()
+st.write("""
+    This app displays calendar heatmaps for various air quality features. 
+    Upload your dataset below to visualize the daily averages of each feature.
+""")
 
-df.set_index('date', inplace=True)
+# Upload CSV file option
+uploaded_file = st.file_uploader("final.csv", type=["csv"])
 
-# Features for visualization
-features = ['pm25', 'pm10', 'aqi', 'co2', 'voc', 'temp', 'humidity', 'battery', 'viral_index']
-
-# Streamlit app title
-st.title("Calendar Heatmap")
-
-# Automatically select the month and year based on the data
-# Here, we just use the first entry in the data to extract the month and year
-first_date = df.index.min()
-month = first_date.month
-year = first_date.year
-
-# Filter data for the selected month and year
-filtered_df = df[(df.index.month == month) & (df.index.year == year)]
-
-# Function to create the calendar layout for heatmap
-def create_calendar_heatmap(data, month, year, feature):
-    # Get the number of days in the selected month
-    num_days = calendar.monthrange(year, month)[1]
+if uploaded_file is not None:
+    # Load data from the uploaded file
+    df = pd.read_csv(uploaded_file)
     
-    # Create a grid for the calendar
-    calendar_grid = np.full((6, 7), np.nan)  # 6 rows (weeks), 7 columns (days of the week)
+    # Display the first few rows of the data
+    st.subheader("Raw Data")
+    st.dataframe(df.head())
     
-    # Get the starting weekday for the month (e.g., Monday=0, Sunday=6)
-    first_day_of_month = calendar.monthrange(year, month)[0]
-    
-    # Populate the calendar grid with values from the feature
-    for day in range(1, num_days + 1):
-        # Get data for the current day
-        day_data = data[data.index.day == day]
-        if not day_data.empty:
-            # Get the average value for the feature
-            avg_value = day_data[feature].mean()
-        else:
-            avg_value = np.nan
-        
-        # Find the corresponding position in the calendar grid
-        row = (day + first_day_of_month - 1) // 7  # Determine the week row
-        col = (day + first_day_of_month - 1) % 7  # Determine the day column
-        
-        # Assign the average value to the grid cell
-        calendar_grid[row, col] = avg_value
-    
-    return calendar_grid
+    # Ensure the 'date' column exists and is in correct datetime format
+    if 'date' in df.columns:
+        df['date'] = pd.to_datetime(df['date'], errors='coerce')  # Convert to datetime, invalid entries will be NaT
+        df = df.dropna(subset=['date'])  # Remove rows with invalid date entries
+    else:
+        st.error("The 'date' column does not exist in the dataset.")
+        st.stop()
 
-# Plot the calendar heatmap for each feature
-for feature in features:
-    # Generate the calendar grid for the current feature
-    calendar_grid = create_calendar_heatmap(filtered_df, month, year, feature)
-    
-    # Create the heatmap plot
-    fig, ax = plt.subplots(figsize=(12, 6))
-    sns.heatmap(calendar_grid, cmap='coolwarm', annot=True, fmt=".1f", cbar_kws={'label': feature},
-                xticklabels=[ 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat','Sun'],
-                yticklabels=['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
-                ax=ax, square=True, annot_kws={'size': 10, 'weight': 'bold'})
+    # Set 'date' as the index
+    df.set_index('date', inplace=True)
 
-    # Add title and labels
-    ax.set_title(f"Calendar Heatmap for {feature} - {calendar.month_name[month]} {year}", fontsize=14)
-    ax.set_xlabel('Day of Week', fontsize=12)
-    ax.set_ylabel('Week', fontsize=12)
+    # Define features for visualization
+    features = ['pm25', 'pm10', 'aqi', 'co2', 'voc', 'temp', 'humidity', 'battery', 'viral_index']
     
-    # Display the plot in Streamlit
+    # Ensure the features exist in the dataset
+    missing_features = [feature for feature in features if feature not in df.columns]
+    if missing_features:
+        st.error(f"These features are missing in the dataset: {', '.join(missing_features)}")
+        st.stop()
+
+    # Set up the subplot grid
+    n_features = len(features)
+    fig, axes = plt.subplots(n_features, 1, figsize=(12, n_features * 3), constrained_layout=True)
+
+    # Weekday labels
+    weekday_labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+
+    for i, feature in enumerate(features):
+        # Resample and reshape the data for the current feature
+        daily_data = df[feature].resample('D').mean()
+        calendar_data = daily_data.to_frame().pivot_table(
+            index=daily_data.index.to_period("W"), columns=daily_data.index.dayofweek, values=feature
+        )
+
+        # Plot the heatmap for the feature
+        sns.heatmap(calendar_data, cmap='coolwarm', annot=True, fmt=".1f", 
+                    cbar_kws={'label': f'Average {feature}'}, ax=axes[i], 
+                    xticklabels=weekday_labels, annot_kws={'size': 10, 'weight': 'bold'})
+
+        # Set the title and labels for each subplot
+        axes[i].set_title(f'Calendar Heatmap of Daily Average {feature}')
+        axes[i].set_xlabel('Day of the Week', fontsize=12)
+        axes[i].set_ylabel('Week', fontsize=12)
+
+    # Overall title
+    plt.suptitle('Calendar Heatmaps for All Features', fontsize=16)
+
+    # Display the heatmaps in Streamlit
     st.pyplot(fig)
+
+else:
+    st.info("Please upload a CSV file to visualize the calendar heatmaps.")
