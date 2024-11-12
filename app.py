@@ -9,7 +9,7 @@ st.title("Calendar Heatmaps for Air Quality Features")
 
 # Read the CSV into a DataFrame
 df = pd.read_csv("final.csv")
-df = df.drop(df.columns[0], axis=1)
+
 # Display first few rows to understand the structure of the CSV file
 st.write("Here are the first few rows of your data:")
 st.dataframe(df.head())  # Display the first few rows of the DataFrame in Streamlit UI
@@ -19,13 +19,8 @@ df.columns = df.columns.str.strip()
 
 # Check if 'date' column exists
 if 'date' in df.columns:
-    # Before attempting to convert 'date' to datetime, print out unique or problematic dates
     # Strip any extra spaces from the date column, just in case
     df['date'] = df['date'].str.strip()
-
-    # Display unique or suspicious date entries
-    st.write("Here are some unique or suspicious date values that might cause issues:")
-    st.write(df['date'].unique())  # Print out the unique date entries
 
     # Attempt to convert 'date' to datetime with error handling
     df['date'] = pd.to_datetime(df['date'], errors='coerce', dayfirst=True)  # dayfirst=True for DD/MM/YYYY format
