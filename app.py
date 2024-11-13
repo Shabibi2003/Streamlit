@@ -28,7 +28,7 @@ if 'date' in df.columns:
 
     features = ['pm25', 'pm10', 'aqi', 'co2', 'voc', 'temp', 'humidity', 'battery', 'viral_index']
     n_features = len(features)
-    fig, axes = plt.subplots(n_features, 1, figsize=(18, n_features * 5), constrained_layout=True)  # Increased size
+    fig, axes = plt.subplots(n_features, 1, figsize=(22, n_features * 5), constrained_layout=True)  # Increased size
 
     day_names = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
