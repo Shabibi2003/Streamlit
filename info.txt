@@ -1,0 +1,1 @@
+hi this the text file and it is created for understanding the concept of git bash
