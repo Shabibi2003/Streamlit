@@ -1,10 +1,7 @@
-# write a function to print multiplication tabels
-
-def print_multiplication_table(number):
-    """Prints the multiplication table for a given number."""
-    print(f"Multiplication table for {number}:")
+# create a function for print the multiplication table
+def print_multiplication_table(n):
+    """Print the multiplication table of n."""
     for i in range(1, 11):
-        print(f"{number} x {i} = {number * i}")
-    print("\n")  # Add a newline for better readability
+        print(f"{n} x {i} = {n * i}")
 
-print_multiplication_table(2)
+print_multiplication_table(5)
